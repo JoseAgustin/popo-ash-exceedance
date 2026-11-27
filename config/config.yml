@@ -1,0 +1,58 @@
+# Configuración del análisis de excedencia (compartida por R y Python).
+# Formato deliberadamente simple: valores escalares y listas en línea [a, b, c].
+
+# Carpeta con los NetCDF cXXM-AAAA.nc (solo lectura; los .nc NO van al repositorio).
+# EDITAR: ruta genérica de ejemplo. También se puede indicar con la variable de entorno
+# POPO_DATA_DIR o con --data-dir (Python). Para uso local, copia este archivo a
+# config/config.local.yml (ignorado por git) y pásalo como argumento.
+data_dir: /ruta/a/los/netcdf
+# Carpeta de salida (ignorada por git)
+output_dir: outputs
+
+# Escenarios: sufijo del archivo -> altura de columna sobre el cráter (km)
+scenarios: [c03M, c05M, c10M]
+column_height_km: [3, 5, 10]
+# Años a procesar. Los archivos que no existan se omiten con un aviso (p. ej. 2025 aún no generado).
+# Un año se marca "parcial" o "con huecos" según las horas con datos de cada archivo (no se fija aquí).
+years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+# Patrón del nombre de archivo (no recoge copias como c03M-2024.nc.prev_20240424)
+file_pattern: "{scenario}-{year}.nc"
+# Variable de depósito: se usa la primera que exista en cada archivo
+variable_candidates: [LOAD, tephra_grn_load]
+# Versión de Fall3D por año, solo si el archivo no la trae en sus atributos (TITLE, Code_version,
+# source). Formato "AAAA:versión", entre comillas. Ejemplo: ["2024:8", "2025:8"]
+version_override: []
+
+# --- Rejilla: Fall3D 7.2 (2018-2023) es 100x100 y Fall3D v8 (2024-2025) es 101x101, mismo dominio ---
+# regrid: LOAD de cada año se interpola (bilineal) a una rejilla común ANTES de compararlo con el
+#         umbral; permite combinar todos los años. La rejilla común tiene regrid_n x regrid_n nodos
+#         sobre domain_lon/domain_lat (100 = la de 2018-2023, que queda sin interpolar; 101 = la de v8).
+# native: cada año en su rejilla; solo se combinan años con la misma rejilla (2018-2023 por un lado,
+#         2024-2025 por otro) y no hay periodo combinado de todos los años.
+# Decisión del proyecto: rejilla común 100x100 (2018-2023 sin interpolar; 2024-2025 interpolados).
+# Los combinados de una sola versión (2018-2023 con 7.2; 2024-2025 con v8) se calculan siempre en su
+# rejilla nativa sin interpolar; el de todos los años (2018-2025) en la rejilla común.
+grid_policy: regrid
+regrid_n: 100
+domain_lon: [-100.62, -96.62]
+domain_lat: [17.02, 21.02]
+
+# Umbral de depósito en kg/m2. Excedencia estricta: LOAD > threshold
+threshold: 0.1
+# Umbrales adicionales para análisis de sensibilidad (opcional, solo se reportan en resumen)
+extra_thresholds: [1.0]
+# Valores por encima de este límite se tratan como relleno (NA)
+fill_limit: 1.0e+30
+
+# Procesamiento por bloques de horas (controla el uso de memoria)
+chunk_hours: 1000
+
+# Cráter del Popocatépetl
+crater_lat: 19.023
+crater_lon: -98.622
+
+# Niveles de probabilidad para calcular área de influencia estacionaria (fracción)
+prob_levels: [0.001, 0.01, 0.05]
+
+# Estaciones por mes: lluvias (mayo-octubre) y secas (noviembre-abril)
+wet_months: [5, 6, 7, 8, 9, 10]
