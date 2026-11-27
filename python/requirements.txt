@@ -1,0 +1,10 @@
+# Necesarios
+numpy>=1.24
+pandas>=2.0
+scipy>=1.10
+matplotlib>=3.7
+# Recomendados:
+#   netCDF4: necesario si los .nc son NetCDF-4/HDF5 (scipy solo lee el formato clásico)
+#   PyYAML: si falta, se usa un lector mínimo de config.yml
+netCDF4>=1.6
+PyYAML>=6.0
