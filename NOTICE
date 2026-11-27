@@ -1,0 +1,34 @@
+popo-ash-exceedance
+Copyright (c) 2026 José Agustín García Reynoso
+Instituto de Ciencias de la Atmósfera y Cambio Climático, UNAM
+
+El CÓDIGO de este repositorio (R/, python/, scripts/, tests/, config/) se distribuye bajo la
+licencia MIT (ver LICENSE).
+
+Los DATOS DE TERCEROS incluidos en data/basemap/ NO están cubiertos por la licencia MIT y
+conservan sus propias condiciones de uso:
+
+1. Límites estatales de México
+   Archivos: data/basemap/states.csv, data/basemap/state_labels.csv (polilíneas recortadas
+   al dominio del análisis y posiciones de etiquetas derivadas).
+   Fuente: Comisión Nacional para el Conocimiento y Uso de la Biodiversidad (CONABIO) (2005).
+   "División Política Estatal". Escala 1:1 000 000. Extraído de: Conjunto de Datos
+   vectoriales topográficos y toponímicos, escala 1:1 000 000. Instituto Nacional de
+   Estadística, Geografía e Informática (INEGI) (2000). México.
+   Capa: destdv1gw. Coordenadas geográficas WGS84.
+   Sitio: http://www.conabio.gob.mx/informacion/gis/
+   Condiciones (según los metadatos de CONABIO): no se permite utilizar estos datos con
+   fines lucrativos y se debe citar la fuente del mapa y a CONABIO. CONABIO solo se hace
+   responsable de la información presentada en el mapa y se deslinda del uso que se le dé.
+
+2. Línea de costa
+   Archivo: data/basemap/coast.csv (recortado al dominio).
+   Fuente: Natural Earth, "Coastline", escala 1:10m (https://www.naturalearthdata.com/),
+   obtenido de https://github.com/nvkelso/natural-earth-vector. Dominio público.
+
+3. Ciudades
+   Archivo: data/basemap/cities.csv. Coordenadas aproximadas y posiciones de etiqueta
+   definidas manualmente para este proyecto (MIT).
+
+Quien reutilice data/basemap/states.csv o state_labels.csv debe respetar las condiciones de
+CONABIO indicadas arriba, aunque el resto del repositorio se use bajo MIT.
