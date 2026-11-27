@@ -22,15 +22,21 @@ variable_candidates: [LOAD, tephra_grn_load]
 # Versión de Fall3D por año, solo si el archivo no la trae en sus atributos (TITLE, Code_version,
 # source). Formato "AAAA:versión", entre comillas. Ejemplo: ["2024:8", "2025:8"]
 version_override: []
+# Archivos cuyos registros se reemplazaron por una reconstruccion desde los .res.nc actuales. La nota se agrega a
+# `nota` de file_inventory.csv y al atributo global `nota_reemplazo` del NetCDF. Solo documenta. La serie 2018-2023
+# es Fall3D 7.1 (confirmado por el autor); el atributo TITLE de los c0XM dice "Fall3d 7.2 results" y el codigo lo
+# usa tal cual, asi que `fall3d_version` muestra 7.2 (valor del atributo, no la version real). Ver docs/correccion_c0XM.md.
+replaced_files: ["c03M-2018", "c05M-2018", "c10M-2018", "c05M-2020", "c10M-2020"]
+replaced_note: "Los archivos c0XM de abril de 2018 (aprox. 720 horas por escenario) y 8 registros de 2020 se reemplazaron el 2026-11-27 por una reconstrucción desde los .res.nc actuales (título Fall3d 7.1). Una muestra de 174 .res.nc no reemplazados también lleva el título 7.1 y su contenido coincide con el c0XM, coherente con que toda la serie sea 7.1."
 
-# --- Rejilla: Fall3D 7.2 (2018-2023) es 100x100 y Fall3D v8 (2024-2025) es 101x101, mismo dominio ---
+# --- Rejilla: Fall3D 7.1 (2018-2023; TITLE dice 7.2) es 100x100 y Fall3D v8 (2024-2025) es 101x101, mismo dominio ---
 # regrid: LOAD de cada año se interpola (bilineal) a una rejilla común ANTES de compararlo con el
 #         umbral; permite combinar todos los años. La rejilla común tiene regrid_n x regrid_n nodos
 #         sobre domain_lon/domain_lat (100 = la de 2018-2023, que queda sin interpolar; 101 = la de v8).
 # native: cada año en su rejilla; solo se combinan años con la misma rejilla (2018-2023 por un lado,
 #         2024-2025 por otro) y no hay periodo combinado de todos los años.
 # Decisión del proyecto: rejilla común 100x100 (2018-2023 sin interpolar; 2024-2025 interpolados).
-# Los combinados de una sola versión (2018-2023 con 7.2; 2024-2025 con v8) se calculan siempre en su
+# Los combinados de una sola versión (2018-2023, Fall3D 7.1 con TITLE 7.2; 2024-2025 con v8) se calculan siempre en su
 # rejilla nativa sin interpolar; el de todos los años (2018-2025) en la rejilla común.
 grid_policy: regrid
 regrid_n: 100

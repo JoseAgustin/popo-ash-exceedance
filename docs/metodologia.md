@@ -6,7 +6,7 @@ Para cada celda y cada conjunto de horas: `P = N(LOAD > u) / N(valores válidos)
 Como cada hora es un pronóstico independiente de una erupción hipotética (escenario de columna fija), `P` es la fracción de esos pronósticos en que el depósito supera `u`. **No es la probabilidad de que ocurra una erupción.** Es una probabilidad condicional a que ocurra el evento simulado, bajo la meteorología de cada hora.
 
 ## Rejillas distintas: `grid_policy`
-Fall3D 7.2 (2018-2023) usa 100 × 100 nodos y Fall3D v8 (2024-2025) 101 × 101 sobre el mismo dominio. Las celdas no se mezclan directamente.
+Fall3D 7.1 (2018-2023; el atributo TITLE de los archivos dice 7.2) usa 100 × 100 nodos y Fall3D v8 (2024-2025) 101 × 101 sobre el mismo dominio. Las celdas no se mezclan directamente.
 
 - **`regrid`** (decisión del proyecto, con `regrid_n: 100`): `LOAD` de cada archivo cuya rejilla no coincide con la rejilla común se interpola de forma bilineal a esa rejilla, **antes** de compararlo con el umbral. La rejilla común tiene `regrid_n` × `regrid_n` nodos sobre `domain_lon`/`domain_lat`: `100` es la de 2018-2023 (esos años quedan sin interpolar) y `101` la de v8. Se usa para cada año y para el combinado de todos los años. Los combinados de una sola versión se calculan en su rejilla nativa (ver "Periodos").
 - **`native`**: cada año se analiza en su rejilla. Solo se combinan años con la misma rejilla; un periodo con rejillas distintas se omite (con aviso y `status = omitido` en `period_definitions.csv`). Hay un NetCDF por rejilla (`prob_exceedance_100x100.nc`, `prob_exceedance_101x101.nc`).
@@ -31,15 +31,15 @@ La excedencia es una función no lineal (escalón) de `LOAD`. Interpolar el camp
 
 ## Periodos
 - Cada año por separado (`period = AAAA`).
-- **Combinados homogéneos** (`kind = homogeneo`): uno por versión de Fall3D con al menos dos años, calculado en la **rejilla nativa** de esa versión, sin interpolar: 2018-2023 (7.2, 100 × 100) y 2024-2025 (v8, 101 × 101). Son las referencias para comparar dentro de una versión. En el NetCDF: `prob_exc_v72` (en `prob_exceedance.nc`) y `prob_exc_v8` (en `prob_exceedance_101x101.nc`).
-- **Combinado de todos los años** (`kind = todos`): 2018-2025 (7.2 + 8) en la rejilla común. Su nota advierte que una diferencia puede deberse al cambio de versión del modelo.
+- **Combinados homogéneos** (`kind = homogeneo`): uno por versión de Fall3D con al menos dos años, calculado en la **rejilla nativa** de esa versión, sin interpolar: 2018-2023 (7.1, etiqueta `7.2` por el atributo TITLE; 100 × 100; ver `docs/correccion_c0XM.md`) y 2024-2025 (v8, 101 × 101). Son las referencias para comparar dentro de una versión. En el NetCDF: `prob_exc_v72` (en `prob_exceedance.nc`) y `prob_exc_v8` (en `prob_exceedance_101x101.nc`).
+- **Combinado de todos los años** (`kind = todos`): 2018-2025 (etiqueta `7.2+8`; real 7.1 + 8) en la rejilla común. Su nota advierte que una diferencia puede deberse al cambio de versión del modelo.
 - Si todos los años son de la misma versión solo hay un combinado (`todos`). `period_definitions.csv` lista los periodos con años, versión, rejilla y estado.
 - 2018-2023 y 2024-2025 tienen rejillas distintas, así que sus mapas no se restan celda a celda; para compararlos usa las tablas (área, horas, probabilidad máxima) o los años v8 en la rejilla común.
 
 Los combinados suman conteos de excedencia y horas válidas de sus años, de modo que cada año pesa según sus horas. Un año parcial pesa menos y su estación incompleta sesga el combinado; la nota lo indica (`incluye año parcial 2025 (hasta ...)`).
 
-## Cambio de versión del modelo (7.2 → 8)
-La física, la parametrización y la configuración de Fall3D 7.2 y 8 no son idénticas, y la rejilla cambia. Una diferencia entre 2018-2023 y 2024-2025 puede reflejar el cambio de versión del modelo y no solo la variabilidad meteorológica entre años. Por eso se reporta el combinado homogéneo 2018-2023 por separado, las tablas llevan la columna `fall3d_version` y las figuras indican la versión de cada año. Para atribuir diferencias al año haría falta correr un mismo periodo con ambas versiones.
+## Cambio de versión del modelo (7.1 → 8; etiqueta 7.2 → 8)
+La física, la parametrización y la configuración de Fall3D 7.1 y 8 no son idénticas, y la rejilla cambia. Una diferencia entre 2018-2023 y 2024-2025 puede reflejar el cambio de versión del modelo y no solo la variabilidad meteorológica entre años. Por eso se reporta el combinado homogéneo 2018-2023 por separado, las tablas llevan la columna `fall3d_version` y las figuras indican la versión de cada año. Para atribuir diferencias al año haría falta correr un mismo periodo con ambas versiones.
 
 ## Años parciales
 El estado (`completo`, `parcial`, `con huecos`) se calcula de las horas con datos de cada archivo, no se fija en la configuración (ver `datos.md`). Un año parcial no cubre todas las estaciones, así que su fracción de horas con excedencia y su mapa de probabilidad **no se comparan directamente** con años completos; para compararlo, usa los mismos meses (`summary_monthly.csv`). Las tablas (`nota`), el NetCDF (`partial_years`, `years_with_gaps`) y las figuras (título, asterisco y achurado) marcan los años parciales con la fecha de su última hora y los años con huecos con las horas faltantes. En los datos actuales no hay años parciales ni con huecos.
@@ -47,7 +47,7 @@ El estado (`completo`, `parcial`, `con huecos`) se calcula de las horas con dato
 ## Métricas horarias
 - `ncells`: celdas con LOAD > u en esa hora. `area_km2`: suma de áreas de esas celdas, con la rejilla de trabajo.
 - Área de celda: `R^2 * dlat * dlon * cos(lat)` (R = 6371.0088 km, radianes).
-- `time` (en `exceedance_hours.csv` y `hourly_metrics.csv.gz`): hora real de cada registro (`horas` en v8; índice en 7.2).
+- `time` (en `exceedance_hours.csv` y `hourly_metrics.csv.gz`): hora real de cada registro (`horas` en v8; índice en 2018-2023).
 - "Hora con excedencia": hora con al menos una celda sobre el umbral. Esta métrica casi siempre vale ~100% (hay depósito cerca del cráter en casi todos los pronósticos); la información útil está en el mapa de probabilidad y en el área.
 - Percentiles de área (`p50`, `p90`, `p99`) sobre horas con excedencia.
 - `area_by_probability_level.csv`: área de celdas con `P >= nivel` (niveles en `prob_levels`).
@@ -57,7 +57,7 @@ El estado (`completo`, `parcial`, `con huecos`) se calcula de las horas con dato
 
 ## Comparación R vs Python
 - Datos reales 2018-2025 (24 archivos, rejilla común y nativa v8): NetCDF idénticos (diferencia 0 en probabilidades, conteos y horas válidas) y tablas con diferencia relativa < 1e-7 (máximo de LOAD, conversión float32/double).
-- Test sintético (`tests/run_synthetic_tests.sh`): archivos 7.2 (100 × 100, `horas` = 0) y v8 (101 × 101, `tephra_grn_load` y `LOAD`, `horas` con huecos, un registro de relleno, años completos y parcial), con `regrid` y `native`. Python y R dan los mismos conteos por celda, NetCDF y tablas (diferencia relativa < 1e-7); 155 controles. La interpolación reproduce sin error un campo lineal.
+- Test sintético (`tests/run_synthetic_tests.sh`): archivos con TITLE 7.2 (100 × 100, `horas` = 0) y v8 (101 × 101, `tephra_grn_load` y `LOAD`, `horas` con huecos, un registro de relleno, años completos y parcial), con `regrid` y `native`. Python y R dan los mismos conteos por celda, NetCDF y tablas (diferencia relativa < 1e-7); 155 controles. La interpolación reproduce sin error un campo lineal.
 - Las configuraciones YAML con `1.0e30` se leen como texto; usar `1.0e+30`.
 
 ## Limitaciones

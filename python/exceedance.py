@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Excedencia de depósito de ceniza (LOAD) en salidas FALL3D (7.2 y v8) del Popocatépetl.
+"""Excedencia de depósito de ceniza (LOAD) en salidas FALL3D (7.1, con TITLE "7.2", y v8) del Popocatépetl.
 
 Autor: Dr. José Agustín García Reynoso (ICAyCC, UNAM) <agustin@atmosfera.unam.mx>
 Licencia: MIT (ver LICENSE).
@@ -10,7 +10,7 @@ frecuencia/probabilidad de LOAD > umbral y métricas horarias (celdas excedidas,
 
 Cada archivo se inspecciona por separado (variable LOAD o tephra_grn_load, dimensiones y
 rejilla reales, versión de Fall3D, tiempo de cada registro); ver python/popo_io.py y docs/datos.md.
-Rejillas distintas (100x100 en Fall3D 7.2 y 101x101 en v8) se manejan con `grid_policy`
+Rejillas distintas (100x100 en Fall3D 7.1/7.2 y 101x101 en v8) se manejan con `grid_policy`
 (config.yml): 'regrid' interpola LOAD a una rejilla común ANTES de comparar con el umbral;
 'native' deja cada año en su rejilla y solo combina años que comparten rejilla.
 
@@ -37,6 +37,8 @@ DEFAULTS = {
     "file_pattern": "{scenario}-{year}.nc",
     "variable_candidates": ["LOAD", "tephra_grn_load"],
     "version_override": [],
+    "replaced_files": [],
+    "replaced_note": "",
     "grid_policy": "regrid",
     "regrid_n": 100,
     "domain_lon": [-100.62, -96.62],
@@ -263,6 +265,8 @@ def process_file(path, scenario, year, cfg, thrs):
         parts.append("sin datos")
     if n_missing > 0:
         parts.append(f"{n_missing} h sin datos")
+    if f"{scenario}-{year}" in (cfg["replaced_files"] or []) and cfg["replaced_note"]:
+        parts.append(str(cfg["replaced_note"]))     # registros reemplazados (ver docs/correccion_c0XM.md)
     inv = dict(scenario=scenario, year=year, file=fname, variable=varname,
                fall3d_version=version, fall3d_version_full=version_full, version_source=version_src,
                grid_native=grid_native, grid=grid_used, regridded=rg is not None,
@@ -314,7 +318,7 @@ def table(H, keys, thrs):
 # Hay dos "espacios" de datos: "work" (rejilla de trabajo: común con grid_policy=regrid, nativa con
 # native) y "native" (rejilla de cada archivo, sin interpolar). Para años no interpolados son iguales.
 #   * cada año: espacio work;
-#   * combinado homogéneo (una sola versión de Fall3D, p. ej. 2018-2023 con 7.2 o 2024-2025 con v8):
+#   * combinado homogéneo (una sola versión de Fall3D, p. ej. 2018-2023 (TITLE 7.2, real 7.1) o 2024-2025 con v8):
 #     espacio native, sin interpolar (requiere que sus años compartan rejilla nativa);
 #   * combinado de todos los años (mezcla de versiones): espacio work (requiere rejilla común).
 def version_tag(v):
@@ -409,6 +413,10 @@ def write_netcdf(path, cfg, lat, lon, Pspace, years, yinfo, sets, space_desc):
     f.partial_years = ",".join(str(y) for y in years if yinfo[y]["status"] == "parcial") or "none"
     f.years_with_gaps = ",".join(f"{y}:{yinfo[y]['n_missing']}h" for y in years if yinfo[y]["status"] == "con huecos") or "none"
     f.source = "popo-ash-exceedance"
+    if cfg["replaced_files"]:
+        # NetCDF clasico: atributos solo ASCII (sin acentos; igual que R)
+        f.nota_reemplazo = (f"{cfg['replaced_note']} [{','.join(str(x) for x in cfg['replaced_files'])}]"
+                            .translate(str.maketrans("áéíóúñÁÉÍÓÚÑüÜ", "aeiounAEIOUNuU")))
     f.createDimension("scenario", len(scs))
     f.createDimension("year", len(years))
     f.createDimension("lat", ny)

@@ -108,6 +108,8 @@ process_file <- function(path, scenario, year, cfg) {
   if (status == "parcial") parts <- c(parts, sprintf("parcial (hasta %s)", last_time))
   if (status == "sin datos") parts <- c(parts, "sin datos")
   if (n_missing > 0) parts <- c(parts, sprintf("%d h sin datos", n_missing))
+  if (paste0(scenario, "-", year) %in% cfg$replaced_files && nzchar(cfg$replaced_note))
+    parts <- c(parts, cfg$replaced_note)     # registros reemplazados (ver docs/correccion_c0XM.md)
   inv <- c(list(scenario = scenario, year = year, file = basename(path), variable = f$var,
                 fall3d_version = ver$label, fall3d_version_full = ver$full, version_source = ver$source,
                 grid_native = grid_native, grid = grid_used, regridded = !is.null(rg),

@@ -28,7 +28,7 @@ summary_table <- function(H, keys, thrs) {
 
 # Periodos combinados. Hay dos "espacios" de datos: "work" (rejilla de trabajo) y "native" (rejilla de
 # cada archivo, sin interpolar; igual a work en años no interpolados).
-#   * combinado homogéneo (una sola versión de Fall3D, p. ej. 2018-2023 con 7.2 o 2024-2025 con v8):
+#   * combinado homogéneo (una sola versión de Fall3D, p. ej. 2018-2023 (TITLE 7.2, real 7.1) o 2024-2025 con v8):
 #     espacio native (requiere que sus años compartan rejilla nativa);
 #   * combinado de todos los años (mezcla de versiones): espacio work (requiere rejilla común).
 # Con una sola versión solo hay el combinado "todos". yinfo: lista nombrada por año (character).

@@ -1,4 +1,4 @@
-# Utilidades: configuración, lectura robusta de NetCDF (Fall3D 7.2 y v8), versión, tiempo y rejilla.
+# Utilidades: configuración, lectura robusta de NetCDF (Fall3D 7.1/7.2 y v8; en 2018-2023 el atributo TITLE dice 7.2 pero la serie es 7.1), versión, tiempo y rejilla.
 # Autor: Dr. José Agustín García Reynoso (ICAyCC, UNAM) <agustin@atmosfera.unam.mx>. Licencia: MIT.
 suppressPackageStartupMessages({
   library(ncdf4)
@@ -12,6 +12,8 @@ DEFAULTS <- list(
   file_pattern = "{scenario}-{year}.nc",
   variable_candidates = c("LOAD", "tephra_grn_load"),
   version_override = list(),
+  replaced_files = list(),
+  replaced_note = "",
   grid_policy = "regrid",
   regrid_n = 100,
   domain_lon = c(-100.62, -96.62),
@@ -28,6 +30,8 @@ read_config <- function(path = "config/config.yml") {
   cfg$variable_candidates <- as.character(unlist(cfg$variable_candidates))
   cfg$domain_lon <- as.numeric(unlist(cfg$domain_lon)); cfg$domain_lat <- as.numeric(unlist(cfg$domain_lat))
   cfg$years <- as.integer(unlist(cfg$years))
+  cfg$replaced_files <- as.character(unlist(cfg$replaced_files))
+  cfg$replaced_note <- paste(as.character(unlist(cfg$replaced_note)), collapse = "")
   if (!cfg$grid_policy %in% c("native", "regrid"))
     stop("grid_policy debe ser 'native' o 'regrid', no '", cfg$grid_policy, "'")
   ov <- list()
@@ -64,7 +68,7 @@ version_label <- function(full) {
   if (as.integer(p[1]) >= 8) p[1] else paste(p[1], p[2], sep = ".")
 }
 
-# Devuelve list(label, full, source). Etiqueta: "7.2", "8" o "desconocida"
+# Devuelve list(label, full, source). Etiqueta: "7.2" (valor del atributo TITLE; 2018-2023 es en realidad 7.1), "8" o "desconocida"
 detect_version <- function(attrs, varname, override = NULL) {
   if (!is.null(override)) return(list(label = if (startsWith(override, "8")) "8" else override,
                                       full = override, source = "config:version_override"))

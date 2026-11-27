@@ -1,4 +1,4 @@
-"""Lectura robusta de los NetCDF cXXM-AAAA.nc (Fall3D 7.2 y v8) y utilidades de rejilla.
+"""Lectura robusta de los NetCDF cXXM-AAAA.nc (Fall3D 7.1/7.2 y v8) y utilidades de rejilla.
 
 Autor: Dr. José Agustín García Reynoso (ICAyCC, UNAM) <agustin@atmosfera.unam.mx>
 Licencia: MIT (ver LICENSE).
@@ -6,7 +6,7 @@ Licencia: MIT (ver LICENSE).
 Qué se detecta en cada archivo (nada se asume por el año):
   * variable de depósito: la primera de `variable_candidates` presente (LOAD, tephra_grn_load);
   * dimensiones (registros, lat, lon) a partir de las dimensiones reales de esa variable;
-  * versión de Fall3D: atributo TITLE ("Fall3d 7.2 results") o Code_version / source ("... 8.0.1");
+  * versión de Fall3D: atributo TITLE ("Fall3d 7.2 results"; en 2018-2023 el atributo es engañoso: la serie es Fall3D 7.1) o Code_version / source ("... 8.0.1");
   * tiempo de cada registro: variable `horas` si trae un valor por registro; si es escalar o
     constante (caso 2018-2023, vale 0) se usa el índice del registro (hora del año).
 """
@@ -23,7 +23,7 @@ EARTH_RADIUS_KM = 6371.0088
 # Versión del modelo y tiempo
 # --------------------------------------------------------------------------
 def detect_version(attrs, varname, override=None):
-    """Devuelve (etiqueta, versión_completa, origen). Etiqueta: '7.2', '8' o 'desconocida'."""
+    """Devuelve (etiqueta, versión_completa, origen). Etiqueta: '7.2' (valor del atributo TITLE; 2018-2023 es en realidad 7.1), '8' o 'desconocida'."""
     if override:
         full = str(override)
         return (full if not full.startswith("8") else "8"), full, "config:version_override"

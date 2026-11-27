@@ -46,6 +46,9 @@ write_prob_netcdf <- function(path, cfg, lat, lon, Pspace, years, yinfo, sets, s
   ncatt_put(nc, 0, "grid_policy", cfg$grid_policy)
   ncatt_put(nc, 0, "grid_space", space_desc)
   ncatt_put(nc, 0, "years", paste(years, collapse = ","))
+  if (length(cfg$replaced_files))
+    ncatt_put(nc, 0, "nota_reemplazo", chartr("áéíóúñÁÉÍÓÚÑüÜ", "aeiounAEIOUNuU",   # NetCDF clasico: solo ASCII (igual que Python)
+              sprintf("%s [%s]", cfg$replaced_note, paste(cfg$replaced_files, collapse = ","))))
   ncatt_put(nc, 0, "fall3d_version_by_year",
             paste(sprintf("%d:%s", years, vapply(as.character(years), function(y) yinfo[[y]]$version, "")), collapse = ","))
   stt <- vapply(as.character(years), function(y) yinfo[[y]]$status, "")

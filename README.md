@@ -4,7 +4,7 @@ Análisis de excedencia del depósito de ceniza (`LOAD`, kg/m2) en pronósticos 
 
 | Años | Fall3D | Rejilla | Estado |
 |---|---|---|---|
-| 2018-2023 | 7.2 | 100 × 100 | completos |
+| 2018-2023 | 7.1 (el atributo TITLE dice 7.2 y las tablas muestran 7.2; ver nota) | 100 × 100 | completos |
 | 2024 | 8 (archivo: 8.0.1) | 101 × 101, mismo dominio | completo (8784 h); en c05M, 2024-03-06 02:00 y 03:00 UTC se calcularon con el WRF del día previo |
 | 2025 | 8 (archivo: 8.2.1) | 101 × 101 | completo (8760 h, hasta 2025-12-31 23:00) |
 
@@ -12,11 +12,13 @@ El código detecta en cada archivo la variable (`LOAD` o `tephra_grn_load`), la 
 
 Periodos que se reportan:
 - **cada año**, en la rejilla común 100 × 100 (2024 y 2025 interpolados de 101 × 101);
-- **2018-2023**: solo Fall3D 7.2, rejilla nativa 100 × 100 (referencia homogénea);
+- **2018-2023**: Fall3D 7.1 (`fall3d_version` = 7.2 por el atributo TITLE, ver nota), rejilla nativa 100 × 100 (referencia homogénea);
 - **2024-2025**: solo Fall3D v8, rejilla nativa 101 × 101, **sin interpolar**;
 - **2018-2025**: todos los años en la rejilla común, con advertencia de mezcla de versiones.
 
-**Una diferencia entre 2018-2023 y 2024-2025 puede reflejar el cambio de versión del modelo (7.2 → 8) y no solo la meteorología.** Detalles en `docs/datos.md` y `docs/metodologia.md`.
+**Una diferencia entre 2018-2023 y 2024-2025 puede reflejar el cambio de versión del modelo (7.1 → 8; en las tablas, 7.2 → 8 por el atributo TITLE) y no solo la meteorología.** Detalles en `docs/datos.md` y `docs/metodologia.md`.
+
+**Nota sobre la versión de Fall3D en 2018-2023.** La serie 2018-2023 se calculó con Fall3D 7.1 (confirmado por el autor). El atributo TITLE de los archivos c0XM dice "Fall3d 7.2 results" y el código lo usa tal cual para detectar la versión, por lo que la columna fall3d_version de las tablas muestra 7.2 para 2018-2023: en estas salidas "7.2" significa el valor del atributo, no la versión real. Los archivos c0XM de abril de 2018 (aprox. 720 horas por escenario) y 8 registros de 2020 se reemplazaron el 2026-11-27 por una reconstrucción desde los .res.nc actuales (título Fall3d 7.1). Una muestra de 174 .res.nc no reemplazados también lleva el título 7.1 y su contenido coincide con el c0XM, coherente con que toda la serie sea 7.1. La columna `nota` de `file_inventory.csv` y el atributo global `nota_reemplazo` de `prob_exceedance.nc` registran el reemplazo. Ver `docs/correccion_c0XM.md`.
 
 Umbral por defecto: `LOAD > 0.1 kg/m2` (parámetro `threshold` en `config/config.yml`).
 
@@ -95,7 +97,7 @@ tests/run_synthetic_tests.sh /tmp/popo_synth [python3]
 - `tables/file_inventory.csv`: por archivo, variable, versión de Fall3D, rejilla nativa y de trabajo, horas con datos, primera y última hora, estado (`completo`, `parcial`, `con huecos`) y nota.
 - `tables/period_definitions.csv`: años de cada periodo, versión, rejilla y si se combinó.
 - Todas las tablas por periodo llevan `fall3d_version`, `grid`, `grid_native` y `nota` (año parcial, mezcla de versiones).
-- Periodos: cada año, 2018-2023 (solo 7.2), 2024-2025 (solo v8, rejilla nativa 101 × 101) y 2018-2025 (7.2+8).
+- Periodos: cada año, 2018-2023 (7.1; etiqueta `7.2` por TITLE), 2024-2025 (solo v8, rejilla nativa 101 × 101) y 2018-2025 (etiqueta `7.2+8`).
 - `netcdf/prob_exceedance.nc` (rejilla común 100 × 100): `prob_exc_year(scenario, year, lat, lon)` de 2018-2025, `prob_exc_all` (2018-2025), `prob_exc_v72` (2018-2023), conteos (`count_exc_*`) y horas válidas (`n_valid_*`).
 - `netcdf/prob_exceedance_101x101.nc` (rejilla nativa v8, sin interpolar): `prob_exc_year` de 2024 y 2025 y `prob_exc_v8` (2024-2025).
 - Atributos globales: `grid`, `grid_space`, `fall3d_version_by_year`, `partial_years`, `years_with_gaps` (p. ej. `2024:2h`).
