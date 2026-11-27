@@ -1,0 +1,32 @@
+# Datos (nunca subir los NetCDF)
+*.nc
+*.nc4
+*.cdf
+# Salidas generadas; solo se conserva un ejemplo pequeño
+outputs/*
+!outputs/example/
+!outputs/.gitkeep
+outputs_test/
+outputs_r/
+# R
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+# Python (entornos virtuales: crearlos fuera del repositorio)
+__pycache__/
+*.pyc
+.venv/
+venv/
+venv_*/
+venv_popo/
+env/
+.env/
+# SO / editores
+.DS_Store
+.idea/
+.vscode/
+data_cache/
+config/config.local.yml
+# Vista HTML local del README (pendiente de decisión del usuario; no versionar por ahora)
+README.html
