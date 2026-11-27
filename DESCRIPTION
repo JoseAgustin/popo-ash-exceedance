@@ -1,0 +1,14 @@
+Package: popoashexceedance
+Title: Exceedance Analysis of FALL3D Ash Deposit Forecasts for Popocatepetl
+Version: 0.2.0
+Authors@R: person("José Agustín", "García Reynoso", email = "agustin@atmosfera.unam.mx",
+    role = c("aut", "cre"),
+    comment = c(affiliation = "Instituto de Ciencias de la Atmósfera y Cambio Climático, Universidad Nacional Autónoma de México (UNAM)"))
+Maintainer: José Agustín García Reynoso <agustin@atmosfera.unam.mx>
+Description: Scripts to compute the probability of exceedance of a ground ash
+    deposit load threshold (default 0.1 kg/m2) from hourly FALL3D NetCDF
+    outputs (version 7.2 for 2018-2023, version 8 for 2024-2025), by scenario and year.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.0.0)
+Imports: ncdf4, yaml, data.table, ggplot2
